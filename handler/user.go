@@ -61,8 +61,8 @@ func UpdateUser(app *common.App) func(c echo.Context) error {
 		}
 		u.Email = strings.ToLower(u.Email)
 		//check user is exit or not against user id
-		user, err1 := app.DB.GetUserById(uid)
-		if err1 != nil {
+		user, err := app.DB.GetUserById(uid)
+		if err != nil {
 			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: messages.OperationFailed}
 			return c.JSON(http.StatusNotFound, m)
 		}
@@ -108,12 +108,16 @@ func UpdateUser(app *common.App) func(c echo.Context) error {
 func GetUser(app *common.App) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		userId := c.Param("id")
-		uid, _ := strconv.Atoi(userId)
+		uid, err := strconv.Atoi(userId)
+		if err != nil {
+			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: messages.OperationFailed}
+			return c.JSON(http.StatusNotFound, m)
+		}
 		// Stub an user information to be populated from the body
 
 		//check user is exit or not against user id
-		user, err1 := app.DB.GetUserById(uid)
-		if err1 != nil {
+		user, err := app.DB.GetUserById(uid)
+		if err != nil {
 			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: messages.OperationFailed}
 			return c.JSON(http.StatusNotFound, m)
 		}
@@ -137,8 +141,8 @@ func GetUser(app *common.App) func(c echo.Context) error {
 func ListUser(app *common.App) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		//check user is exit or not against user id
-		user, err1 := app.DB.GetUser()
-		if err1 != nil {
+		user, err := app.DB.GetUser()
+		if err != nil {
 			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: messages.OperationFailed}
 			return c.JSON(http.StatusNotFound, m)
 		}
@@ -178,8 +182,8 @@ func AssignRoleToUser(app *common.App) func(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, m)
 		}
 		//check user is exit or not against user id
-		user, err1 := app.DB.GetUserById(uid)
-		if err1 != nil {
+		user, err := app.DB.GetUserById(uid)
+		if err != nil {
 			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: messages.OperationFailed}
 			return c.JSON(http.StatusNotFound, m)
 		}
@@ -225,8 +229,8 @@ func SignUp(app *common.App) func(c echo.Context) error {
 		}
 		u.Email = strings.ToLower(u.Email)
 		//get user from database against email
-		user, err1 := app.DB.GetUserByEmail(u.Email)
-		if err1 == nil && user != nil {
+		user, err := app.DB.GetUserByEmail(u.Email)
+		if err == nil && user != nil {
 			m := model.SuccessResponse{Data: user, Message: "User is already present with this email", SubMessage: "Please check  email...You have received verification email"}
 			return c.JSON(http.StatusAccepted, m)
 		}
@@ -437,14 +441,14 @@ func Login(app *common.App) func(c echo.Context) error {
 		}
 		u.Email = strings.ToLower(u.Email)
 		//get user from database against email
-		user, err1 := app.DB.GetUserByEmail(u.Email)
-		if err1 != nil {
-			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: err1.Error()}
+		user, err := app.DB.GetUserByEmail(u.Email)
+		if err != nil {
+			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: err.Error()}
 			return c.JSON(http.StatusBadRequest, m)
 		}
 		fmt.Println(user.Password, u.Password)
 		fmt.Println([]byte(user.Password), []byte(u.Password))
-		err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password))
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password))
 		if err != nil {
 			m := model.BadResponse{Message: messages.PleaseTryAgain, SubMessage: err.Error()}
 			return c.JSON(http.StatusBadRequest, m)
