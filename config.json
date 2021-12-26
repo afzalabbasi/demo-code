@@ -1,0 +1,6 @@
+{
+	"database": {
+		"driver": "postgres",
+		"connection": "host=localhost port= 5432 user=postgres password=******** dbname=Test sslmode=disable"
+	}
+}
