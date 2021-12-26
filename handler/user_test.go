@@ -209,7 +209,7 @@ func TestVerifyUser(t *testing.T) {
 	}
 
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, testresult)
+		_, _ = fmt.Fprint(w, testresult)
 	}))
 
 	// NewUnstartedServer creates a listener. Close that listener and replace
